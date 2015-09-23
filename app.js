@@ -1,16 +1,12 @@
 var track = ['job', 'work', 'opportunity'];
 
-const ipc = require('ipc')
 const keywordsInput = document.querySelector('#keywords')
 keywordsInput.value = track.join(', ')
 keywordsInput.focus()
 
 keywordsInput.addEventListener('change', function (evt) {
-  console.log("this should only happen once")
-  let track = this.value.split(',')
-  if(track.length>0){
-    changeStream(track)
-  }
+  const track = this.value.split(',')
+  if(track.length>0){ changeStream(track) }
 })
 
 const config = require('./config.json');
@@ -25,10 +21,13 @@ const notifier = require('node-notifier')
 
 //GETTING
 const Twit = require('Twit')
-const t = new Twit(config)
+var t = null
+var stream = null
 
-const changeStream = function(track) {
+const changeStream = function(keywords) {
+  track = keywords
   console.log(`we are now tracking ${track}`)
+  t = new Twit(config)
   stream = t.stream('user', { track })
 
   stream.on('tweet', (tweet) => {
