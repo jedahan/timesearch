@@ -1,3 +1,5 @@
-Make a new app in twitter, and add your credentials to config.json
+Authenticate with twitter, and it will notify you anything in your feed that matches some keywords.
 
-Now you can see notifications for job searches
+Super alpha!
+
+I use it for job searching...
