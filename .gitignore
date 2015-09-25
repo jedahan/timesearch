@@ -1,5 +1,5 @@
-config.json
-node_modules
+*.db
+*.json
 .DS_Store
+node_modules
 npm-debug.log
-tweets.db
