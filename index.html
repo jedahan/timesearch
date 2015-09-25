@@ -1,16 +1,28 @@
 <meta charset='utf-8'>
 <style>
-body {margin: 0; padding: 0; font-size: 100%; line-height: 1.5; background-color: #789}
-article, aside, figcaption, figure, footer, header, nav, section {display: block;}
-h1, h2, h3, h4 {margin: 1em 0 .5em; line-height: 1.25;}
-h1 {font-size: 2em;}
-h2 {font-size: 1.5em;}
-h3 {font-size: 1.2em;}
-ul, ol {margin: 1em 0; padding-left: 40px;}
-p, figure {margin: 1em 0;}
-a img {border: none;}
-sup, sub {line-height: 0;}
+  body {margin: 0; padding: 0; font-size: 100%; line-height: 1.5; background-color: #789}
+  article, aside, figcaption, figure, footer, header, nav, section {display: block;}
+  h1, h2, h3, h4 {margin: 1em 0 .5em; line-height: 1.25;}
+  h1 {font-size: 2em;}
+  h2 {font-size: 1.5em;}
+  h3 {font-size: 1.2em;}
+  ul, ol {margin: 1em 0; padding-left: 40px;}
+  p, figure {margin: 1em 0;}
+  a img {border: none;}
+  sup, sub {line-height: 0;}
 </style>
+
 <label for=keywords>keywords </label>
-<input type='text' id=keywords placeholder='Type some keywords...'>
-<script type="text/javascript" src="app.js"></script>
+<input type=text id=keywords />
+
+<script>
+  const ipc = require('ipc')
+
+  const keywordsInput = document.querySelector('#keywords')
+
+  keywordsInput.addEventListener('change', function(evt) {
+    ipc.send('keywords', this.value)
+  })
+
+  keywordsInput.value = require('./keywords.json').keywords.join(", ")
+</script>
