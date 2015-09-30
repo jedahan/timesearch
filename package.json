@@ -11,7 +11,7 @@
   },
   "devDependencies": {},
   "scripts": {
-    "start": "node --harmony_destructuring index.js"
+    "start": "electron ."
   },
   "author": "",
   "license": "ISC"
