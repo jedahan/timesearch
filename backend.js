@@ -1,4 +1,4 @@
-var {keywords} = require('./keywords.json')
+var { keywords } = require('./keywords.json')
 
 // DATABASE
 const nedb = require('nedb');
@@ -13,51 +13,54 @@ const notifier = require('node-notifier')
 const ipc = require('ipc')
 const twitterApi = require('node-twitter-api')
 const twitter = new twitterApi({
-    consumerKey: process.env.CONSUMER_KEY,
-    consumerSecret: process.env.CONSUMER_SECRET,
-    callback: 'http://127.0.0.1:5000/oauth'
+  consumerKey: process.env.CONSUMER_KEY,
+  consumerSecret: process.env.CONSUMER_SECRET,
+  callback: 'http://127.0.0.1:5000/oauth'
 });
 
 var http = require('http');
 
-http.createServer(function (req, res) {
+http.createServer(function(req, res) {
   const query = require('url').parse(req.url, true).query
   console.log(query)
   twitter.getAccessToken(
     process.env.REQUEST_TOKEN,
     process.env.REQUEST_TOKEN_SECRET,
-    query.oauth_verifier, function(error, accessToken, accessTokenSecret, results) {
+    query.oauth_verifier,
+    function(error, accessToken, accessTokenSecret, results) {
       if (error) {
         console.log(error);
       } else {
         process.env.ACCESS_TOKEN = accessToken;
         process.env.ACCESS_TOKEN_SECRET = accessTokenSecret;
         fs.writeFile('./config.json', JSON.stringify({
-            consumer_key: process.env.CONSUMER_KEY
-            , consumer_secret:  process.env.CONSUMER_SECRET
-            , access_token: process.env.ACCESS_TOKEN
-            , access_token_secret:  process.env.ACCESS_TOKEN_SECRET
-          }), function(err){
-            if (err) throw err;
-            exports.changeStream(keywords.join(", "))
+          consumer_key: process.env.CONSUMER_KEY,
+          consumer_secret: process.env.CONSUMER_SECRET,
+          access_token: process.env.ACCESS_TOKEN,
+          access_token_secret: process.env.ACCESS_TOKEN_SECRET
+        }), function(err) {
+          if (err) throw err;
+          exports.changeStream(keywords.join(", "))
         })
       }
     });
-  res.writeHead(301, {"Location": 'index.html'});
+  res.writeHead(301, {
+    "Location": 'index.html'
+  });
   res.end();
 }).listen(5000, "127.0.0.1");
 
 const util = require('util');
 exports.authenticate = function authenticate(callback) {
-  if(!process.env.REQUEST_TOKEN && !process.env.REQUEST_TOKEN_SECRET){
-    twitter.getRequestToken(function(error, requestToken, requestTokenSecret, results){
-        if (error) {
-            console.log("Error getting OAuth request token : " + util.inspect(error));
-        } else {
-            process.env.REQUEST_TOKEN = requestToken;
-            process.env.REQUEST_TOKEN_SECRET = requestTokenSecret;
-            callback(twitter.getAuthUrl(process.env.REQUEST_TOKEN))
-        }
+  if (!process.env.REQUEST_TOKEN && !process.env.REQUEST_TOKEN_SECRET) {
+    twitter.getRequestToken(function(error, requestToken, requestTokenSecret, results) {
+      if (error) {
+        console.log("Error getting OAuth request token : " + util.inspect(error));
+      } else {
+        process.env.REQUEST_TOKEN = requestToken;
+        process.env.REQUEST_TOKEN_SECRET = requestTokenSecret;
+        callback(twitter.getAuthUrl(process.env.REQUEST_TOKEN))
+      }
     });
   } else {
     callback(twitter.getAuthUrl(process.env.REQUEST_TOKEN))
@@ -78,26 +81,35 @@ exports.changeStream = function changeStream(newKeywords) {
     if (err) throw err;
     console.log(`we are now tracking ${keywords}`)
     t = new Twit({
-      consumer_key: process.env.CONSUMER_KEY
-    , consumer_secret:  process.env.CONSUMER_SECRET
-    , access_token: process.env.ACCESS_TOKEN
-    , access_token_secret:  process.env.ACCESS_TOKEN_SECRET
+      consumer_key: process.env.CONSUMER_KEY,
+      consumer_secret: process.env.CONSUMER_SECRET,
+      access_token: process.env.ACCESS_TOKEN,
+      access_token_secret: process.env.ACCESS_TOKEN_SECRET
     })
-    stream = t.stream('user', { track: keywords })
+    stream = t.stream('user', {
+      track: keywords
+    })
 
     stream.on('tweet', (tweet) => {
-      if(friends.indexOf(tweet.user.id) > -1){
+      if (friends.indexOf(tweet.user.id) > -1) {
         processTweet(tweet)
       }
     });
 
-    t.get('statuses/home_timeline', {track: keywords, count: 100}, function(err, data, response){
-      if(!err) { data.forEach((tweet) => { processTweet(tweet) }) }
+    t.get('statuses/home_timeline', {
+      track: keywords,
+      count: 100
+    }, function(err, data, response) {
+      if (!err) {
+        data.forEach((tweet) => {
+          processTweet(tweet)
+        })
+      }
     });
 
     // FILTERING
     stream.on('friends', (msg) => {
-      friends = msg.friends.sort((a,b) => a-b)
+      friends = msg.friends.sort((a, b) => a - b)
     })
   })
 }
@@ -119,7 +131,7 @@ const processTweet = function(tweet) {
   }
 }
 
-const notify = function(tweet){
+const notify = function(tweet) {
   notifier.notify({
     title: `@${tweet.screen_name}`,
     message: tweet.text,
